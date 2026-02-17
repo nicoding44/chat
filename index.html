@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pawwi Chat UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FFF1EB"> <title>Pawwi Chat</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
 
     <style>
-        /* --- DISEÑO PAWWIIISSS FINAL FIANL FINAL FINAAAAAL --- */
+        /* --- CSS: PAWWI NATIVE MOBILE --- */
         :root {
             --bg-cream: #FFF1EB;      
             --brand-navy: #120A2B;     
@@ -27,37 +27,63 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background-color: #222; 
+            background-color: var(--bg-cream); /* En móvil, el fondo es la app */
             font-family: 'Plus Jakarta Sans', sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            height: 100dvh; /* Dynamic Viewport Height (Clave para iOS) */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Evita scroll en el body, solo en el chat */
         }
 
-        /* FRAME DISPOSITIVO */
-        .device-frame {
-            width: 100%; max-width: 420px; height: 100%;
+        /* CONTENEDOR PRINCIPAL (Responsive) */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
             background-color: var(--bg-cream);
-            display: flex; flex-direction: column;
-            position: relative; overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* MEDIA QUERY: SOLO PARA ESCRITORIO (Simula el celular) */
+        @media (min-width: 768px) {
+            body {
+                background-color: #222; /* Fondo oscuro en desktop */
+                align-items: center;
+                justify-content: center;
+            }
+            .app-container {
+                max-width: 400px;
+                height: 90vh; /* No ocupa todo el alto en PC */
+                max-height: 850px;
+                border-radius: 24px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+                overflow: hidden;
+            }
         }
 
         /* HEADER */
         .chat-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 12px 16px;
+            /* Padding top considera el Notch del iPhone */
+            padding: max(12px, env(safe-area-inset-top)) 16px 12px 16px;
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            z-index: 10;
+            z-index: 20;
             box-shadow: var(--shadow-soft);
-            gap: 10px;
+            flex-shrink: 0; /* No se encoge */
         }
 
-        .header-left { display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden; }
+        .header-left { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
 
-        .avatar-container { position: relative; width: 42px; height: 42px; flex-shrink: 0; }
+        .btn-back { 
+            background: none; border: none; cursor: pointer; color: var(--brand-navy); 
+            display: flex; align-items: center; justify-content: center; padding: 8px;
+            margin-left: -8px; /* Ajuste visual */
+        }
+
+        .avatar-container { position: relative; width: 40px; height: 40px; flex-shrink: 0; }
         .avatar-container img { 
             width: 100%; height: 100%; border-radius: 50%; 
             background-color: var(--bg-cream);
@@ -68,7 +94,7 @@
             border-radius: 50%; position: absolute; bottom: 0; right: 0;
         }
 
-        .text-info { display: flex; flex-direction: column; overflow: hidden; }
+        .text-info { display: flex; flex-direction: column; overflow: hidden; margin-left: 4px; }
         .text-info h2 { 
             font-size: 0.95rem; color: var(--brand-navy); font-weight: 700; line-height: 1.2; 
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -81,7 +107,7 @@
         }
         .icon-tiny { font-size: 14px; color: var(--brand-navy); }
 
-        /* BOTÓN SOPORTE (NUEVO) */
+        /* BOTÓN SOPORTE (Estilo Pill) */
         .btn-support {
             background-color: rgba(18, 10, 43, 0.05);
             color: var(--brand-navy);
@@ -92,24 +118,23 @@
             font-weight: 700;
             display: flex; align-items: center; gap: 6px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.1s;
             white-space: nowrap;
         }
-        .btn-support span { font-size: 18px; color: #D946EF; /* Un tono rosado fuerte */ }
-        
-        .btn-support:active { transform: scale(0.95); background-color: rgba(18, 10, 43, 0.1); }
-
-        .btn-back { 
-            background: none; border: none; cursor: pointer; color: var(--brand-navy); 
-            display: flex; align-items: center; justify-content: center; padding: 4px;
-        }
+        .btn-support span { font-size: 18px; color: #D946EF; }
+        .btn-support:active { transform: scale(0.95); background: rgba(18, 10, 43, 0.1); }
 
         /* ÁREA DE CHAT */
         .chat-area {
-            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;
+            flex: 1; 
+            padding: 16px; 
+            overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 12px;
             background-image: radial-gradient(var(--brand-pink) 1px, transparent 1px);
             background-size: 24px 24px;
             background-color: var(--bg-cream);
+            overscroll-behavior-y: contain; /* Evita rebote de toda la página */
+            -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
         }
 
         .system-message {
@@ -119,10 +144,10 @@
             display: flex; gap: 10px; align-items: flex-start;
             color: var(--brand-navy); font-size: 0.8rem; line-height: 1.4;
         }
-        .system-message .material-symbols-rounded { font-size: 18px; color: var(--brand-navy); margin-top: 2px; }
+        .system-message .material-symbols-rounded { font-size: 18px; color: var(--brand-navy); margin-top: 2px; flex-shrink: 0; }
 
         .message { 
-            max-width: 80%; padding: 12px 16px; border-radius: var(--radius-bubble); 
+            max-width: 85%; padding: 10px 14px; border-radius: var(--radius-bubble); 
             font-size: 0.95rem; line-height: 1.45; position: relative; 
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             word-wrap: break-word;
@@ -133,7 +158,7 @@
             background: var(--white);
             color: var(--brand-navy);
             border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .message.sent {
@@ -141,7 +166,7 @@
             background: var(--brand-navy);
             color: var(--white);
             border-bottom-right-radius: 4px;
-            box-shadow: 0 2px 10px rgba(18, 10, 43, 0.2);
+            box-shadow: 0 2px 8px rgba(18, 10, 43, 0.15);
         }
 
         .message-time {
@@ -150,10 +175,14 @@
 
         /* INPUT AREA */
         .input-area {
-            background: var(--white); padding: 12px 16px;
+            background: var(--white); 
+            padding: 12px 16px;
+            /* Padding bottom considera la barra de inicio del iPhone */
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
             display: flex; align-items: flex-end; gap: 8px;
             border-top: 1px solid rgba(0,0,0,0.05);
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            flex-shrink: 0;
+            z-index: 20;
         }
 
         .input-wrapper {
@@ -165,8 +194,9 @@
         textarea {
             width: 100%; background: transparent; border: none; outline: none;
             font-family: 'Plus Jakarta Sans', sans-serif; resize: none;
-            font-size: 0.95rem; line-height: 1.4; max-height: 120px;
-            padding: 8px 0; color: var(--brand-navy);
+            font-size: 1rem; /* 16px evita zoom automático en iOS al hacer focus */
+            line-height: 1.4; max-height: 100px;
+            padding: 10px 0; color: var(--brand-navy);
         }
 
         .btn-send {
@@ -176,34 +206,35 @@
             cursor: pointer; transition: transform 0.2s; flex-shrink: 0;
         }
         .btn-send:active { transform: scale(0.9); }
-        .btn-send.disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-send.disabled { opacity: 0.5; }
 
         .btn-attach { 
             background: var(--gray-light); border: none; color: var(--gray-text); 
             cursor: pointer; width: 44px; height: 44px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
+        .btn-attach:active { background: #e5e7eb; }
 
-        /* SEGURIDAD */
+        /* TOAST DE SEGURIDAD (Floating) */
         .toast {
-            position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+            position: absolute; top: 110px; left: 50%; transform: translateX(-50%) translateY(-20px);
             background: var(--brand-navy); color: var(--white);
             padding: 12px 20px; border-radius: 30px;
             display: flex; align-items: center; gap: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-            width: 85%; font-size: 0.85rem; z-index: 100;
+            width: 90%; max-width: 350px; font-size: 0.85rem; z-index: 100;
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            opacity: 0; pointer-events: none; transform: translate(-50%, -20px);
+            opacity: 0; pointer-events: none;
         }
         .toast.visible { opacity: 1; transform: translate(-50%, 0); }
         .toast-icon { color: var(--red-alert); background: rgba(255,255,255,0.1); border-radius: 50%; padding: 4px; }
 
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="device-frame">
+    <div class="app-container">
         
         <header class="chat-header">
             <div class="header-left">
@@ -226,7 +257,7 @@
 
             <button class="btn-support" id="btn-support" onclick="alert('Conectando con soporte Pawwi...')">
                 <span class="material-symbols-rounded">support_agent</span>
-                Unir a Soporte
+                Soporte
             </button>
         </header>
 
@@ -248,7 +279,7 @@
 
         <div id="security-toast" class="toast">
             <span class="material-symbols-rounded toast-icon">gpp_bad</span>
-            <p>Por seguridad, hemos bloqueado el envío de datos de contacto.</p>
+            <p>Por seguridad, no permitimos compartir datos de contacto externos.</p>
         </div>
 
         <div class="input-area">
@@ -267,25 +298,17 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // ELEMENTOS
             const messageInput = document.getElementById('message-input');
             const sendBtn = document.getElementById('send-btn');
             const messageContainer = document.getElementById('message-container');
             const toast = document.getElementById('security-toast');
 
-            // --- PATRONES PROHIBIDOS (Seguridad) ---
             const forbiddenPatterns = [
-                /\b3\d{9}\b/,          // Celulares
-                /\b3\d{2}[\s.-]?\d{3}[\s.-]?\d{4}\b/, 
-                /(instagram|facebook|tiktok|twitter)\.com/i, 
-                /@[\w\d._]+/,          
-                /wa\.me/,              
-                /\+57/,                
-                /\d{3}.*\d{3}.*\d{4}/ 
+                /\b3\d{9}\b/, /\b3\d{2}[\s.-]?\d{3}[\s.-]?\d{4}\b/, 
+                /(instagram|facebook|tiktok|twitter)\.com/i, /@[\w\d._]+/,          
+                /wa\.me/, /\+57/, /\d{3}.*\d{3}.*\d{4}/ 
             ];
 
-            // --- FUNCIONES ---
             function showToast() {
                 toast.classList.add('visible');
                 if (navigator.vibrate) navigator.vibrate(200);
@@ -295,12 +318,9 @@
             function appendMessage(text, type) {
                 const div = document.createElement('div');
                 div.classList.add('message', type);
-                
                 const now = new Date();
                 const time = now.getHours().toString().padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2, '0');
-
                 div.innerHTML = `${text}<span class="message-time">${time}</span>`;
-                
                 messageContainer.appendChild(div);
                 messageContainer.scrollTo({ top: messageContainer.scrollHeight, behavior: 'smooth' });
             }
@@ -309,7 +329,6 @@
                 const text = messageInput.value.trim();
                 if (!text) return;
 
-                // VALIDACIÓN
                 let isSuspicious = forbiddenPatterns.some(pattern => pattern.test(text));
                 const digitCount = (text.match(/\d/g) || []).length;
                 if (digitCount > 6) isSuspicious = true;
@@ -321,22 +340,19 @@
                     return;
                 }
 
-                // ENVIAR
                 appendMessage(text, 'sent');
                 messageInput.value = '';
                 messageInput.style.height = 'auto';
                 sendBtn.classList.add('disabled');
                 sendBtn.style.opacity = "0.5";
 
-                // RESPUESTA AUTOMÁTICA
                 setTimeout(() => {
-                    const replies = ["¡Dale! Entendido 👍", "Súper, gracias por avisar.", "Te envío foto apenas lleguemos."];
+                    const replies = ["¡Entendido! 👍", "Súper, gracias.", "Te mando foto ahora 📸"];
                     const randomReply = replies[Math.floor(Math.random() * replies.length)];
                     appendMessage(randomReply, 'received');
                 }, 1500);
             }
 
-            // LISTENERS
             sendBtn.addEventListener('click', sendMessage);
             
             messageInput.addEventListener('keypress', (e) => {
@@ -357,7 +373,6 @@
                     sendBtn.style.opacity = "1";
                 }
             });
-            
             sendBtn.style.opacity = "0.5";
         });
     </script>
